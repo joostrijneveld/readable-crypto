@@ -3,31 +3,74 @@
 SBOX = [0x7, 0x4, 0xA, 0x9, 0x1, 0xF, 0xB, 0x0,
         0xC, 0x3, 0x2, 0x6, 0x8, 0xE, 0xD, 0x5]
 
+
+def sbox_nibble(bits, i, N):
+    """Replaces the i-th nibble (0-base) in N bits with SBOX[nibble]."""
+    offset = N - (i+1)*4
+    nibble = (bits >> offset) & 0xF  # fetch the nibble
+    bits &= (~(0xF << offset)) & int('1' * N, 2)  # null the nibble
+    return bits | (SBOX[nibble] << offset)  # add sbox result back
+
+
 class KLEIN(object):
 
     def __init__(self, nr=12, size=64):
         self.nr = nr
         self.size = size
+        self.halfsizemask = int('1' * (size//2), 2)
 
     def addRoundKey(self, state, sk):
-        pass
+        return state ^ sk & 0xFFFFFFFFFFFFFFFF
 
     def subNibbles(self, state):
-        pass
+        for i in range(16):
+            state = sbox_nibble(state, i, 64)
+        return state
 
     def rotateNibbles(self, state):
-        pass
+        result = (state << 16) & 0xFFFFFFFFFFFFFFFF
+        result |= state >> 48
+        return result
 
     def mixNibbles(self, state):
-        pass
+        def mix_columns(bits):
+            c01 = 0xFF & (bits >> 24)
+            c23 = 0xFF & (bits >> 16)
+            c45 = 0xFF & (bits >> 8)
+            c67 = 0xFF & bits
+
+            def mul2or3(x, n):  # this is not nearly as generic as galoisMult
+                x = (x << 1) if n == 2 else ((x << 1) ^ x)
+                if x > 0xFF:
+                    return (x ^ 0x1B) & 0xFF
+                return x
+
+            s01 = mul2or3(c01, 2) ^ mul2or3(c23, 3) ^ c45 ^ c67
+            s23 = c01 ^ mul2or3(c23, 2) ^ mul2or3(c45, 3) ^ c67
+            s45 = c01 ^ c23 ^ mul2or3(c45, 2) ^ mul2or3(c67, 3)
+            s67 = mul2or3(c01, 3) ^ c23 ^ c45 ^ mul2or3(c67, 2)
+            return s01 << 24 | s23 << 16 | s45 << 8 | s67
+
+        col1 = mix_columns(state >> 32)
+        col2 = mix_columns(state & 0xFFFFFFFFFFFFFFFF)
+        return col1 << 32 | col2
 
     def keySchedule(self, sk, i):
-        pass
+        a = (sk >> self.size//2)
+        b = sk & self.halfsizemask
+        a = (a << 8) & self.halfsizemask | (a >> (self.size//2 - 8))
+        b = (b << 8) & self.halfsizemask | (b >> (self.size//2 - 8))
+        a ^= b
+        a, b = b, a
+        a ^= i << (self.size//2 - 24)
+        for i in range(2, 6):
+            b = sbox_nibble(b, i, self.size//2)
+        return a << self.size//2 | b
 
     def encrypt(self, plaintext, key, nr=12, size=64):
         state = plaintext
         sk = key
-        for i in range(nr):
+        for i in range(1, nr+1):
             state = self.addRoundKey(state, sk)
             state = self.subNibbles(state)
             state = self.rotateNibbles(state)
