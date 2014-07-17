@@ -17,7 +17,6 @@ class KLEIN(object):
     def __init__(self, nr=12, size=64):
         self.nr = nr
         self.size = size
-        self.halfsizemask = int('1' * (size//2), 2)
 
     def addRoundKey(self, state, sk):
         return state ^ (sk >> self.size-64) & 0xFFFFFFFFFFFFFFFF
@@ -57,9 +56,9 @@ class KLEIN(object):
 
     def keySchedule(self, sk, i):
         a = (sk >> self.size//2)
-        b = sk & self.halfsizemask
-        a = (a << 8) & self.halfsizemask | (a >> (self.size//2 - 8))
-        b = (b << 8) & self.halfsizemask | (b >> (self.size//2 - 8))
+        b = sk & int('1' * (self.size//2), 2)
+        a = (a << 8) & int('1' * (self.size//2), 2) | (a >> (self.size//2 - 8))
+        b = (b << 8) & int('1' * (self.size//2), 2) | (b >> (self.size//2 - 8))
         a ^= b
         a, b = b, a
         a ^= i << (self.size//2 - 24)

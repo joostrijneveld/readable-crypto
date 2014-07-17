@@ -9,8 +9,7 @@ class KLEINTest(unittest.TestCase):
         self.klein96 = KLEIN.KLEIN(nr=20, size=96)
 
     def test_sbox_nibble(self):
-        self.assertEqual(KLEIN.sbox_nibble(0x01234567, 3, 32),
-                         0x01294567)
+        self.assertEqual(KLEIN.sbox_nibble(0x01234567, 3, 32), 0x01294567)
         self.assertEqual(KLEIN.sbox_nibble(0x0123456789ABCDEF, 12, 64),
                          0x123456789AB8DEF)
 
