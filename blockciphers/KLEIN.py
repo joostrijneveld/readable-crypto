@@ -20,7 +20,7 @@ class KLEIN(object):
         self.halfsizemask = int('1' * (size//2), 2)
 
     def addRoundKey(self, state, sk):
-        return state ^ sk & 0xFFFFFFFFFFFFFFFF
+        return state ^ (sk >> self.size-64) & 0xFFFFFFFFFFFFFFFF
 
     def subNibbles(self, state):
         for i in range(16):
@@ -67,10 +67,10 @@ class KLEIN(object):
             b = sbox_nibble(b, i, self.size//2)
         return a << self.size//2 | b
 
-    def encrypt(self, plaintext, key, nr=12, size=64):
+    def encrypt(self, plaintext, key):
         state = plaintext
         sk = key
-        for i in range(1, nr+1):
+        for i in range(1, self.nr+1):
             state = self.addRoundKey(state, sk)
             state = self.subNibbles(state)
             state = self.rotateNibbles(state)
