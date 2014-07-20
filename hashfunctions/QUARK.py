@@ -52,6 +52,43 @@ class U_QUARK(QUARK_ABC):
     r = 8
     c = 128
     n = 136
+    
+    def f(self, X):
+        bX = lambda i: get_bit(X, 68-1 - i)
+        return (bX(0) ^ bX(9) ^ bX(14) ^ bX(21) ^ bX(28) ^ bX(33) ^ bX(37) ^
+                bX(45) ^ bX(50) ^ bX(52) ^ bX(55) ^ bX(55) & bX(59) ^
+                (bX(33) & bX(37)) ^ (bX(9) & bX(15)) ^
+                (bX(45) & bX(52) & bX(55)) ^ (bX(21) & bX(28) & bX(33)) ^
+                (bX(9) & bX(28) & bX(45) & bX(59)) ^
+                (bX(33) & bX(37) & bX(52) & bX(55)) ^
+                (bX(15) & bX(21) & bX(55) & bX(59)) ^
+                (bX(37) & bX(45) & bX(52) & bX(55) & bX(59)) ^
+                (bX(9) & bX(15) & bX(21) & bX(28) & bX(33)) ^
+                (bX(21) & bX(28) & bX(33) & bX(37) & bX(45) & bX(52)))
+
+    def g(self, Y):
+        bY = lambda i: get_bit(Y, 68-1 - i)
+        return (bY(0) ^ bY(7) ^ bY(16) ^ bY(20) ^ bY(30) ^ bY(35) ^ bY(37) ^
+                bY(42) ^ bY(49) ^ bY(51) ^ bY(54) ^
+                (bY(54) & bY(58)) ^ (bY(35) & bY(37)) ^ (bY(7) & bY(15)) ^
+                (bY(42) & bY(51) & bY(54)) ^ (bY(20) & bY(30) & bY(35)) ^
+                (bY(7) & bY(30) & bY(42) & bY(58)) ^
+                (bY(35) & bY(37) & bY(51) & bY(54)) ^
+                (bY(15) & bY(20) & bY(54) & bY(58)) ^
+                (bY(37) & bY(42) & bY(51) & bY(54) & bY(58)) ^
+                (bY(7) & bY(15) & bY(20) & bY(30) & bY(35)) ^
+                (bY(20) & bY(30) & bY(35) & bY(37) & bY(42) & bY(51)))
+
+    def h(self, X, Y, L):
+        bX = lambda i: get_bit(X, 68-1 - i)
+        bY = lambda i: get_bit(Y, 68-1 - i)
+        bL = lambda i: get_bit(L, 10-1 - i)
+        return (bL(0) ^ bX(1) ^ bY(2) ^ bX(4) ^ bY(10) ^ bX(25) ^ bX(31) ^
+                bY(43) ^ bX(56) ^ bY(59) ^
+                (bY(3) & bX(55)) ^ (bX(46) & bX(55)) ^ (bX(55) & bY(59)) ^
+                (bY(3) & bX(25) & bX(46)) ^ (bY(3) & bX(46) & bX(55)) ^
+                (bY(3) & bX(46) & bY(59)) ^
+                (bL(0) & bX(25) & bX(46) & bY(59)) ^ (bL(0) & bX(25)))
 
 
 class D_QUARK(QUARK_ABC):
