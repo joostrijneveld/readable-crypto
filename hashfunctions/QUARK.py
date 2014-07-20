@@ -3,9 +3,18 @@
 # the main motivation for not using the abc module here is to maintain
 # compatibility with Python 2. This might be refactored in the future.
 
+import math
 
 def get_bit(val, i):
     return int(val & (1 << i) != 0)
+
+
+def to_blocks(val, length, N):
+    result = []
+    for i in range(N):
+        result.append(val & int('1' * length, 2))
+        val >>= length
+    return reversed(result)
 
 
 class QUARK_ABC(object):
@@ -38,8 +47,9 @@ class QUARK_ABC(object):
     def initialise(self, m, prefix_zeros=0):
         m = m << 1 | 1
         length = len(bin(m)) - 2 + prefix_zeros  # -2 for 0b prefix
-        return m << (self.r - length % self.r)
-    
+        m = m << (self.r - length % self.r)
+        N = math.ceil((prefix_zeros + length) / self.r)
+        return to_blocks(m, self.r, N)
     def absorb(self, m):
         pass
 
@@ -47,10 +57,11 @@ class QUARK_ABC(object):
         pass        
 
     def hash(self, m, prefix_zeros=0):
-        m = initialise(m, prefix_zeros)
-        s = absorb(m)
-        return squeeze(s)
-        
+        m = self.initialise(m, prefix_zeros)
+        s = self.absorb(m)
+        return self.squeeze(s)
+
+
 class U_QUARK(QUARK_ABC):
 
     r = 8
