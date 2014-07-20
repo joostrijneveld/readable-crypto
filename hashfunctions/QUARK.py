@@ -32,7 +32,9 @@ class QUARK_ABC(object):
         raise NotImplementedError("Function h not implemented!")
 
     def initialise(self, m, prefix_zeros=0):
-        pass
+        m = m << 1 | 1
+        l = len(bin(m)) - 2 + prefix_zeros  # -2 for 0b prefix
+        return m << (self.r - l % self.r)
     
     def absorb(self, m):
         pass
