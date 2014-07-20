@@ -33,8 +33,8 @@ class QUARK_ABC(object):
 
     def initialise(self, m, prefix_zeros=0):
         m = m << 1 | 1
-        l = len(bin(m)) - 2 + prefix_zeros  # -2 for 0b prefix
-        return m << (self.r - l % self.r)
+        length = len(bin(m)) - 2 + prefix_zeros  # -2 for 0b prefix
+        return m << (self.r - length % self.r)
     
     def absorb(self, m):
         pass
