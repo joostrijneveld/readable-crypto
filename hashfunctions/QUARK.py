@@ -22,6 +22,10 @@ class QUARK_ABC(object):
     def n(self):
         raise NotImplementedError("Output length n not specified")
 
+    @property
+    def IV(self):
+        raise NotImplementedError("Initialisation vector not specified")
+
     def f(self, X):
         raise NotImplementedError("Function f not implemented!")
 
@@ -52,7 +56,8 @@ class U_QUARK(QUARK_ABC):
     r = 8
     c = 128
     n = 136
-    
+    IV = 0xD8DACA44414A099719C80AA3AF065644DB
+
     def f(self, X):
         bX = lambda i: get_bit(X, 68-1 - i)
         return (bX(0) ^ bX(9) ^ bX(14) ^ bX(21) ^ bX(28) ^ bX(33) ^ bX(37) ^
@@ -96,6 +101,7 @@ class D_QUARK(QUARK_ABC):
     r = 16
     c = 160
     n = 176
+    IV = 0xCC6C4AB7D11FA9BDF6EEDE03D87B68F91BAA706C20E9
 
 
 class S_QUARK(QUARK_ABC):
@@ -103,3 +109,4 @@ class S_QUARK(QUARK_ABC):
     r = 32
     c = 224
     n = 256
+    IV = 0x397251CEE1DE8AA73EA26250C6D7BE128CD3E79DD718C24B8A19D09C2492DA5D
