@@ -50,11 +50,25 @@ class QUARK_ABC(object):
         m = m << (self.r - length % self.r)
         N = math.ceil((prefix_zeros + length) / self.r)
         return to_blocks(m, self.r, N)
+
+    def P(self, s):
+        return s
+
     def absorb(self, m):
-        pass
+        s = self.IV
+        for mblock in m:
+            s = s ^ mblock
+            s = self.P(s)
+        return s
 
     def squeeze(self, s):
-        pass        
+        result = 0x0
+        for i in range(self.n // self.r - 1):
+            result = result | (s & int('1' * self.r, 2))
+            result <<= self.r
+            s = self.P(s)
+        result = result | (s & int('1' * self.r, 2))
+        return result
 
     def hash(self, m, prefix_zeros=0):
         m = self.initialise(m, prefix_zeros)
