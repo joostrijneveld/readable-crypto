@@ -52,7 +52,7 @@ class QUARK_ABC(object):
         length = len(bin(m)) - 2 + prefix_zeros  # -2 for 0b prefix
         m <<= self.r - length % self.r
         N = math.ceil((prefix_zeros + length) / self.r)
-        return to_blocks(m, self.r, N)
+        return m, N
 
     def P(self, s):
         b = self.r + self.c
@@ -68,9 +68,9 @@ class QUARK_ABC(object):
             Lnew = (Y << 1 | (self.p(L) ^ ht)) & mask_log4b
         return X << (b//2) | Y
 
-    def absorb(self, m):
+    def absorb(self, m, N):
         s = self.IV
-        for mblock in m:
+        for mblock in to_blocks(m, self.r, N):
             s = s ^ mblock
             s = self.P(s)
         return s
@@ -85,8 +85,8 @@ class QUARK_ABC(object):
         return result
 
     def hash(self, m, prefix_zeros=0):
-        m = self.initialise(m, prefix_zeros)
-        s = self.absorb(m)
+        m, N = self.initialise(m, prefix_zeros)
+        s = self.absorb(m, N)
         return self.squeeze(s)
 
 
