@@ -36,18 +36,21 @@ class QUARK_ABC(object):
         raise NotImplementedError("Initialisation vector not specified")
 
     def f(self, X):
-        raise NotImplementedError("Function f not implemented!")
+        raise NotImplementedError("Function f not specified")
 
     def g(self, Y):
-        raise NotImplementedError("Function g not implemented!")
+        raise NotImplementedError("Function g not specified")
 
     def h(self, X, Y, L):
-        raise NotImplementedError("Function h not implemented!")
+        raise NotImplementedError("Function h not specified")
+
+    def p(self, L):
+        raise NotImplementedError("Function p not specified")
 
     def initialise(self, m, prefix_zeros=0):
         m = m << 1 | 1
         length = len(bin(m)) - 2 + prefix_zeros  # -2 for 0b prefix
-        m = m << (self.r - length % self.r)
+        m <<= self.r - length % self.r
         N = math.ceil((prefix_zeros + length) / self.r)
         return to_blocks(m, self.r, N)
 
@@ -120,6 +123,9 @@ class U_QUARK(QUARK_ABC):
                 (bY(3) & bX(46) & bY(59)) ^
                 (bL(0) & bX(25) & bX(46) & bY(59)) ^ (bL(0) & bX(25)))
 
+    def p(self, L):
+        bL = lambda i: get_bit(L, 10-1 - i)
+        return bL(0) ^ bL(3)
 
 class D_QUARK(QUARK_ABC):
 
