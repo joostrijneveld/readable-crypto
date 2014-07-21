@@ -55,7 +55,18 @@ class QUARK_ABC(object):
         return to_blocks(m, self.r, N)
 
     def P(self, s):
-        return s
+        b = self.r + self.c
+        mask_b2 = int('1' * (b//2), 2)
+        mask_log4b = int('1' * math.ceil(math.log2(4 * b)), 2)
+        X = s >> (b//2)
+        Y = s & mask_b2
+        L = mask_log4b
+        for i in range(4 * b):
+            ht = self.h(X, Y, L)
+            Xnew = (X << 1 | (get_bit(Y, b//2-1) ^ self.f(X) ^ ht)) & mask_b2
+            Ynew = (Y << 1 | (self.g(Y) ^ ht)) & mask_b2
+            Lnew = (Y << 1 | (self.p(L) ^ ht)) & mask_log4b
+        return X << (b//2) | Y
 
     def absorb(self, m):
         s = self.IV
