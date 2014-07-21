@@ -8,9 +8,7 @@ def sbox_nibble(bits, i, N):
     """Replaces the i-th nibble (0-base) in N bits with SBOX[nibble]."""
     offset = N - (i+1)*4
     nibble = (bits >> offset) & 0xF  # fetch the nibble
-    bits &= (~(0xF << offset)) & int('1' * N, 2)  # null the nibble
-    return bits | (SBOX[nibble] << offset)  # add sbox result back
-
+    return bits & ~(0xF << offset) | (SBOX[nibble] << offset)  # add back in
 
 class KLEIN(object):
 
@@ -27,9 +25,7 @@ class KLEIN(object):
         return state
 
     def rotateNibbles(self, state):
-        result = (state << 16) & 0xFFFFFFFFFFFFFFFF
-        result |= state >> 48
-        return result
+        return (state << 16) & 0xFFFFFFFFFFFFFFFF | (state >> 48)
 
     def mixNibbles(self, state):
         def mix_columns(bits):
@@ -66,7 +62,7 @@ class KLEIN(object):
             b = sbox_nibble(b, i, self.size//2)
         return a << self.size//2 | b
 
-    def encrypt(self, plaintext, key):
+    def encrypt(self, key, plaintext):
         state = plaintext
         sk = key
         for i in range(1, self.nr+1):

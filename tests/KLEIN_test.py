@@ -37,7 +37,7 @@ class KLEINTest(unittest.TestCase):
 
     def test_testvectors64(self):
         def v(key, plaintext, ciphertext):
-            self.assertEqual(self.klein64.encrypt(plaintext, key), ciphertext)
+            self.assertEqual(self.klein64.encrypt(key, plaintext), ciphertext)
         v(0xFFFFFFFFFFFFFFFF, 0x0000000000000000, 0x6456764E8602E154)
         v(0xFFFFFFFFFFFFFFFF, 0x0000000000000000, 0x6456764E8602E154)
         v(0x1234567890ABCDEF, 0xFFFFFFFFFFFFFFFF, 0x592356C4997176C8)
@@ -45,7 +45,7 @@ class KLEINTest(unittest.TestCase):
 
     def test_testvectors80(self):
         def v(key, plaintext, ciphertext):
-            self.assertEqual(self.klein80.encrypt(plaintext, key), ciphertext)
+            self.assertEqual(self.klein80.encrypt(key, plaintext), ciphertext)
         v(0x00000000000000000000, 0xFFFFFFFFFFFFFFFF, 0x6677E20D1A53A431)
         v(0xFFFFFFFFFFFFFFFFFFFF, 0x0000000000000000, 0x82247502273DCC5F)
         v(0x1234567890ABCDEF1234, 0xFFFFFFFFFFFFFFFF, 0x3F210F67CB23687A)
@@ -53,7 +53,7 @@ class KLEINTest(unittest.TestCase):
 
     def test_testvectors96(self):
         def v(key, plaintext, ciphertext):
-            self.assertEqual(self.klein96.encrypt(plaintext, key), ciphertext)
+            self.assertEqual(self.klein96.encrypt(key, plaintext), ciphertext)
         v(0x000000000000000000000000, 0xFFFFFFFFFFFFFFFF, 0xDB9FA7D33D8E8E36)
         v(0xFFFFFFFFFFFFFFFFFFFFFFFF, 0x0000000000000000, 0x15A3A03386A7FEC6)
         v(0x1234567890ABCDEF12345678, 0xFFFFFFFFFFFFFFFF, 0x79687798AFDA0BC3)
