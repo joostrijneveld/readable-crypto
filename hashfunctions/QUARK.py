@@ -65,7 +65,8 @@ class QUARK_ABC(object):
             ht = self.h(X, Y, L)
             Xnew = (X << 1 | (get_bit(Y, b//2-1) ^ self.f(X) ^ ht)) & mask_b2
             Ynew = (Y << 1 | (self.g(Y) ^ ht)) & mask_b2
-            Lnew = (Y << 1 | (self.p(L) ^ ht)) & mask_log4b
+            Lnew = (L << 1 | self.p(L)) & mask_log4b
+            X, Y, L = Xnew, Ynew, Lnew
         return X << (b//2) | Y
 
     def absorb(self, m, N):
