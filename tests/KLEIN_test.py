@@ -1,6 +1,7 @@
 import unittest
 import blockciphers.KLEIN as KLEIN
 
+
 class KLEINTest(unittest.TestCase):
 
     def setUp(self):
@@ -57,6 +58,6 @@ class KLEINTest(unittest.TestCase):
         v(0xFFFFFFFFFFFFFFFFFFFFFFFF, 0x0000000000000000, 0x15A3A03386A7FEC6)
         v(0x1234567890ABCDEF12345678, 0xFFFFFFFFFFFFFFFF, 0x79687798AFDA0BC3)
         v(0x000000000000000000000000, 0x1234567890ABCDEF, 0x5006A987A500BFDD)
-        
+
 if __name__ == '__main__':
     unittest.main()
