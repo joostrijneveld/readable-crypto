@@ -74,6 +74,16 @@ class SPONGENT(object):
             s = self.pLayer(s)
         return s
 
+    # The necessity of this function is not clear in the SPONGENT article
+    # It follows from the test vectors produced by the reference implementation
+    # The message blocks are reversed on a per-byte basis; this shows for r > 8
+    def reverse_block(self, block):
+        result = 0
+        for _ in range(self.r//8):
+            result = result << 8 | block & 0xFF
+            block >>= 8
+        return result
+
     def absorb(self, m, N):
         mblocks = []
         for i in range(N):
@@ -81,17 +91,17 @@ class SPONGENT(object):
             m >>= self.r
         s = 0
         for mblock in reversed(mblocks):
-            s = s ^ mblock
+            s = s ^ self.reverse_block(mblock)
             s = self.P(s)
         return s
 
     def squeeze(self, s):
         result = 0x0
         for i in range(self.n // self.r - 1):
-            result = result | (s & int('1' * self.r, 2))
+            result = result | self.reverse_block(s & int('1' * self.r, 2))
             result <<= self.r
             s = self.P(s)
-        result = result | (s & int('1' * self.r, 2))
+        result = result | self.reverse_block(s & int('1' * self.r, 2))
         return result
 
     def hash(self, m, prefix_zeros=0):
