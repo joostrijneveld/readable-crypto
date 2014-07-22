@@ -19,6 +19,7 @@ class SPONGENT(object):
                      224: int('0000001', 2),
                      256: int('10011110', 2)}[n]
         self.LFSRsize = math.ceil(math.log2(R))
+        self.LFSRmask = int('1' * self.LFSRsize, 2)
 
     def initialise(self, m, prefix_zeros=0):
         m = m << 1 | 1
@@ -28,7 +29,7 @@ class SPONGENT(object):
         return m, N
 
     def sBoxLayer(self, state):
-        for i in range(0, 64, 4):
+        for i in range(0, (self.r + self.c), 4):
             word = (state >> i) & 0xF
             state = state & ~(0xF << i) | (SBOX[word] << i)
         return state
@@ -47,25 +48,24 @@ class SPONGENT(object):
         return state
 
     def lCounter(self):
-        z = lambda i: (self.LFSR >> self.LFSRsize-i) & 0x1
+        z = lambda i: (self.LFSR >> i-1) & 0x1
         if self.n == 88:
-            x = z(6) ^ z(5) ^ 1
+            x = z(6) ^ z(5)
         elif self.n in [128, 160, 224]:
-            x = z(7) ^ z(6) ^ 1
+            x = z(7) ^ z(6)
         elif self.n == 256:
-            x = z(8) ^ z(4) ^ z(3) ^ z(2) ^ 1
-        self.LFSR = self.LFSR >> 1 | self.LFSR & 0x1 << self.LFSRsize-1
-        return x
+            x = z(8) ^ z(4) ^ z(3) ^ z(2)
+        self.LFSR = (self.LFSR << 1 | x) & self.LFSRmask
 
     def P(self, s):
-        for i in range(1, self.R):
-            x = xcopy = self.lCounter()
-            revx = 0
+        for _ in range(1, self.R+1):
+            tmp = self.LFSR
+            revLFSR = 0
             for _ in range(self.LFSRsize):
-                revx <<= 1
-                revx |= xcopy & 1
-                xcopy >>= 1
-            s = (revx << self.r + self.c - self.LFSRsize) ^ s ^ x
+                revLFSR = revLFSR << 1 | tmp & 0x1
+                tmp >>= 1
+            s = (revLFSR << (self.r + self.c - self.LFSRsize)) ^ s ^ self.LFSR
+            self.lCounter()
             s = self.sBoxLayer(s)
             s = self.pLayer(s)
         return s
