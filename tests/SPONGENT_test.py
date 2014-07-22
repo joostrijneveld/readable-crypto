@@ -6,6 +6,10 @@ class SPONGENTTest(unittest.TestCase):
 
     def setUp(self):
         self.spongent80 = SPONGENT.SPONGENT(n=88, c=80, r=8, R=45)
+        self.spongent128 = SPONGENT.SPONGENT(n=128, c=128, r=8, R=70)
+        self.spongent160 = SPONGENT.SPONGENT(n=160, c=160, r=16, R=90)
+        self.spongent224 = SPONGENT.SPONGENT(n=224, c=224, r=16, R=120)
+        self.spongent256 = SPONGENT.SPONGENT(n=256, c=256, r=16, R=140)
 
     def test_sBoxLayer(self):
         self.assertEqual(self.spongent80.sBoxLayer(0x0123456789ABCDEF012345),
@@ -33,6 +37,14 @@ class SPONGENTTest(unittest.TestCase):
         m = 0x53706F6E6765202B2050726573656E74203D2053706F6E67656E74
         self.assertEqual(0x69971BF96DEF95BFC46822,
                          self.spongent80.hash(m, prefix_zeros=1))
+        self.assertEqual(0x6B7BA35EB09DE0F8DEF06AE555694C53,
+                         self.spongent128.hash(m, prefix_zeros=1))
+        self.assertEqual(0x13188A4917EA29E258362C047B9BF00C22B5FE91,
+                         self.spongent160.hash(m, prefix_zeros=1))
+        self.assertEqual(0x8443B12D2EEE4E09969A183205F5F7F684A711A5BE079A15F4CCDC30,
+                         self.spongent224.hash(m, prefix_zeros=1))
+        self.assertEqual(0x67DC8FC8B2EDBA6E55F4E68EC4F2B2196FE38DF9B1A760F4D43B4669160BF5A8,
+                         self.spongent256.hash(m, prefix_zeros=1))
 
 if __name__ == '__main__':
     unittest.main()
