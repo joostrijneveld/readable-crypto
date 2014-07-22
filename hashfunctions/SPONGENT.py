@@ -13,13 +13,9 @@ class SPONGENT(object):
         self.c = c
         self.r = r
         self.R = R
-        self.LFSR = {88:  int('000101', 2),
-                     128: int('1111010', 2),
-                     160: int('1000101', 2),
-                     224: int('0000001', 2),
-                     256: int('10011110', 2)}[n]
         self.LFSRsize = math.ceil(math.log2(R))
         self.LFSRmask = int('1' * self.LFSRsize, 2)
+        self.reset_LFSR()
 
     def initialise(self, m, prefix_zeros=0):
         m = m << 1 | 1
@@ -47,6 +43,13 @@ class SPONGENT(object):
             state = state & ~(0x1 << Pb(j)) | ((oldstate >> j) & 0x1) << Pb(j)
         return state
 
+    def reset_LFSR(self):
+        self.LFSR = {88:  int('000101', 2),
+                     128: int('1111010', 2),
+                     160: int('1000101', 2),
+                     224: int('0000001', 2),
+                     256: int('10011110', 2)}[self.n]
+
     def lCounter(self):
         z = lambda i: (self.LFSR >> i-1) & 0x1
         if self.n == 88:
@@ -58,6 +61,7 @@ class SPONGENT(object):
         self.LFSR = (self.LFSR << 1 | x) & self.LFSRmask
 
     def P(self, s):
+        self.reset_LFSR()
         for _ in range(1, self.R+1):
             tmp = self.LFSR
             revLFSR = 0
